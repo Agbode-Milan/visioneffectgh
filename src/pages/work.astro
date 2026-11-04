@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import WorkCard from '../components/WorkCard.astro';
+import Viewer from '../components/Viewer.astro';
+import Cta from '../components/Cta.astro';
+import { projects, logos } from '../data/work';
+
+const categories = ['All', ...new Set(projects.map((p) => p.category))];
+---
+<Base title="Work" description="Packaging, stationery and logo design by Vision Effects for businesses and organisations in Ghana and abroad.">
+  <section class="page-intro on-dark">
+    <div class="wrap">
+      <h1>Our work</h1>
+      <p class="lede">Packaging, stationery and brand identities for businesses and organisations of different kinds and sizes.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="filters" role="group" aria-label="Filter work by category">
+        {categories.map((c, i) => (
+          <button type="button" data-filter={c} aria-pressed={i === 0 ? 'true' : 'false'}>{c}</button>
+        ))}
+      </div>
+      <ul class="work-grid">
+        {projects.map((p, i) => <WorkCard project={p} loading={i < 2 ? 'eager' : 'lazy'} />)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section on-dark">
+    <div class="wrap">
+      <div class="section-head"><h2>Logos and identities</h2></div>
+      <ul class="logo-grid">
+        {logos.map((l) => (
+          <li>
+            <Image src={l.image} alt={`${l.client} logo`} height={208} format="webp" loading="lazy" />
+            <span>{l.client}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <Cta title="Would you like work like this for your business?" />
+  <Viewer />
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const cards = document.querySelectorAll<HTMLElement>('.work-card');
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        buttons.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+        cards.forEach((c) => {
+          c.hidden = b.dataset.filter !== 'All' && c.dataset.category !== b.dataset.filter;
+        });
+      }),
+    );
+  </script>
+</Base>

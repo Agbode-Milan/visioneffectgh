@@ -1,0 +1,58 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Cta from '../components/Cta.astro';
+import portrait from '../assets/michael-full.jpg';
+
+const values = [
+  { title: 'Vision', text: 'We look for what a brand could become, then design towards it.' },
+  { title: 'Excellence', text: 'Every job gets our full attention, from a logo to a box of business cards.' },
+  { title: 'Passion', text: 'We enjoy this work, and it shows in the details.' },
+  { title: 'Integrity', text: 'We communicate honestly and do what we say we will do.' },
+];
+const experience = [
+  { when: '2017 to now', what: 'CEO, Vision Effects' },
+  { when: '2015', what: 'Creative Director, Impact Digiprint' },
+  { when: '2012 to 2014', what: 'Creative Director, Cluster Smash Solutions' },
+];
+---
+<Base title="About" description="Vision Effects is a branding and print studio in Accra, led by Michael Xorla Domee, working with clients in Ghana and abroad.">
+  <section class="page-intro on-dark">
+    <div class="wrap">
+      <h1>A partner for every place your brand appears.</h1>
+      <p class="lede">Vision Effects is a branding and print studio based in Accra, working with clients in Ghana and abroad.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap split">
+      <Image
+        src={portrait}
+        alt="Michael Xorla Domee, standing, in a dark blazer and blue shirt"
+        widths={[480, 800, 1200]}
+        sizes="(max-width: 820px) 100vw, 45vw"
+        format="webp"
+      />
+      <div>
+        <p class="eyebrow">CEO and Creative Director</p>
+        <h2>Michael Xorla Domee</h2>
+        <p>Michael is a graphic designer and video editor who has worked with a wide range of companies on print and digital projects. He approaches each job with a plan suited to that client's needs, and works comfortably within brand guidelines.</p>
+        <p>He studied Graphic and Web Design at IPMC Ghana and Film Editing at NAFTI.</p>
+        <ul class="timeline">
+          {experience.map((e) => <li><span>{e.when}</span>{e.what}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--mist">
+    <div class="wrap">
+      <div class="section-head"><h2>What guides us</h2></div>
+      <div class="value-grid">
+        {values.map((v) => <div><h3>{v.title}</h3><p>{v.text}</p></div>)}
+      </div>
+    </div>
+  </section>
+
+  <Cta title="Let's talk about your brand." />
+</Base>

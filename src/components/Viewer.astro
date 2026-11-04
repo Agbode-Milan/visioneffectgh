@@ -1,0 +1,25 @@
+<dialog class="viewer" aria-label="Enlarged image">
+  <img alt="" />
+  <div class="viewer-bar">
+    <span data-caption></span>
+    <button type="button" data-close>Close</button>
+  </div>
+</dialog>
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.viewer')!;
+  const img = dialog.querySelector('img')!;
+  const caption = dialog.querySelector('[data-caption]')!;
+  document.querySelectorAll<HTMLAnchorElement>('[data-viewer]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      img.src = link.href;
+      img.alt = link.querySelector('img')?.alt ?? '';
+      caption.textContent = link.dataset.caption ?? '';
+      dialog.showModal();
+    });
+  });
+  dialog.querySelector('[data-close]')!.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Cta from '../components/Cta.astro';
+import { services } from '../data/site';
+---
+<Base title="Services" description="Corporate branding, packaging and graphic design, general printing, and digital and video work from Vision Effects in Accra.">
+  <section class="page-intro on-dark">
+    <div class="wrap">
+      <h1>Services</h1>
+      <p class="lede">Everything your brand needs to look consistent, on the shelf, on paper and on screen.</p>
+    </div>
+  </section>
+  <section class="section section--flush">
+    <div class="wrap">
+      {services.map((s) => (
+        <article class="service-row" id={s.id}>
+          <h2>{s.title}</h2>
+          <p>{s.detail}</p>
+          <ul>{s.items.map((i) => <li>{i}</li>)}</ul>
+        </article>
+      ))}
+    </div>
+  </section>
+  <Cta />
+</Base>
