@@ -24,6 +24,7 @@
 
 .tone-ink { background: var(--ink); color: #fff; --soft: var(--on-ink-soft); }
 .tone-plum { background: var(--plum); color: #fff; --soft: #e0d9ec; }
+.tone-cream { background: var(--paper); color: var(--ink); --soft: #33234a; }
 .tone-lime { background: var(--lime); color: var(--ink); --soft: #2b2340; }
 .tone-yellow { background: var(--yellow); color: var(--ink); --soft: #33234a; }
 
@@ -174,46 +175,60 @@ em { font-style: italic; color: var(--yellow); }
 .statement { padding-block: clamp(5rem, 13vw, 12rem); background: var(--paper); }
 .statement p { font-family: var(--display); font-size: clamp(2rem, 5.2vw, 5.25rem); line-height: 1.08; letter-spacing: -0.026em; max-width: 21ch; }
 
-/* Work showcase: pinned sideways travel on desktop, swipe on phones */
+/* Work showcase. Desktop: pinned sideways travel through panels of different widths. Phones: cards that stack */
 .showcase { position: relative; background: var(--ink); overflow: hidden; }
 .showcase-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; z-index: 5; background: rgba(255, 255, 255, 0.15); display: none; }
 .showcase-progress span { display: block; height: 100%; background: var(--yellow); transform-origin: left; transform: scaleX(0); }
 .showcase.is-pinned .showcase-progress { display: block; }
-/* Phones and tablets: vertical scrolling moves the work sideways. Without animation it stays a swipe row */
-.showcase.is-travel { overflow: visible; }
-.is-travel .showcase-stage { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; }
-.is-travel .showcase-progress { display: block; }
-.is-travel .showcase-track { overflow: visible; width: max-content; height: 100%; scroll-snap-type: none; will-change: transform; }
-.is-travel .panel { height: 100%; }
 .showcase-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
 .showcase-track::-webkit-scrollbar { display: none; }
 .showcase.is-pinned .showcase-track { overflow: visible; width: max-content; scroll-snap-type: none; }
-.panel { position: relative; flex: 0 0 100vw; height: 100vh; height: 100svh; scroll-snap-align: start; overflow: hidden; }
+.showcase-skip { position: absolute; right: var(--gutter); bottom: 1.5rem; z-index: 6; padding: 0.55rem 1rem; border-radius: 99px; background: var(--ink); color: #fff; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: background 0.3s, color 0.3s; }
+.showcase-skip:hover, .showcase-skip:focus-visible { background: var(--yellow); color: var(--ink); }
+
+.panel { position: relative; flex: 0 0 var(--w, 100vw); height: 100vh; height: 100svh; scroll-snap-align: start; overflow: hidden; }
 .panel a { position: absolute; inset: 0; display: block; color: inherit; text-decoration: none; }
-.panel-name {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  text-align: center;
-  font-family: var(--display);
-  font-size: clamp(5rem, 24vw, 26rem);
-  line-height: 1;
-  letter-spacing: -0.045em;
-  white-space: nowrap;
-  opacity: 0.13;
-  pointer-events: none;
-}
-.panel-product { position: absolute; inset: 0; margin: auto; width: min(62vw, 110vh); max-height: 74vh; object-fit: contain; will-change: transform; }
-.panel-photo { width: min(68vw, 96vh); }
-.panel-caption { position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(1.5rem, 3.5vw, 3rem); display: grid; grid-template-columns: auto 1fr; gap: 0 1.25rem; align-items: baseline; }
-.panel-count { grid-row: span 2; font-size: 0.9375rem; font-weight: 600; opacity: 0.8; }
-.panel-title { font-family: var(--display); font-size: clamp(1.75rem, 3.2vw, 3rem); line-height: 1.05; letter-spacing: -0.02em; }
-.panel-what { font-size: 1.0625rem; color: var(--soft); }
-.panel--end { flex-basis: 62vw; }
-.panel--end a { display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; padding-inline: clamp(1.5rem, 6vw, 6rem); }
-.panel-end-text { font-family: var(--display); font-size: clamp(3rem, 9vw, 9rem); line-height: 0.98; letter-spacing: -0.035em; }
+.panel img { position: absolute; max-width: none; will-change: transform; }
+.panel-caption { position: absolute; left: var(--gutter); top: calc(var(--header) + 0.5rem); z-index: 2; display: block; }
+.panel-title { display: block; font-family: var(--display); font-size: clamp(2.5rem, 5vw, 5rem); line-height: 1; letter-spacing: -0.03em; }
+.panel-what { display: block; margin-top: 0.5rem; font-size: 1.0625rem; color: var(--soft); max-width: 22rem; }
+
+/* Starly's: the bottles fill the screen, so the labels become the picture */
+.panel--starlys a::after { content: ''; position: absolute; inset: 55% 0 0; z-index: 1; background: linear-gradient(transparent, rgba(36, 19, 56, 0.92)); pointer-events: none; }
+.panel--starlys img { --iw: max(100vw, 165vh); width: var(--iw); height: auto; left: calc(50% - var(--iw) / 2); top: calc(50% - var(--iw) * 0.4); }
+.panel--starlys .panel-caption { top: auto; bottom: clamp(2rem, 5vh, 3.5rem); }
+.panel--starlys .panel-title { font-size: clamp(3.5rem, 9vw, 9rem); }
+.panel--starlys .panel-what { font-size: clamp(1.0625rem, 1.5vw, 1.375rem); max-width: none; }
+
+/* Graceland: a large name, with the two pouches overlapping beneath it */
+.panel--grace { --w: 74vw; }
+.panel--grace .panel-title { font-size: min(11vw, 19vh); font-style: italic; line-height: 0.95; }
+.pouch { width: auto; }
+.pouch--chips { height: 58vh; left: 16%; bottom: 7vh; rotate: -7deg; z-index: 2; }
+.pouch--gari { height: 64vh; right: 8%; bottom: 3vh; rotate: 8deg; z-index: 3; }
+
+/* Winnie's and Odo share a panel, one wide and angled, one tall */
+.panel--duo { --w: 92vw; display: flex; }
+.panel--duo a { position: relative; inset: auto; overflow: hidden; }
+.panel--duo a.duo-odo { color: #fff; }
+.duo-winnies { flex: 1.5 1 0; }
+.duo-winnies img { inset: 6vh 0 0; margin: auto; width: min(44vw, 80vh); height: auto; }
+.duo-odo { flex: 1 1 0; }
+.duo-odo img { height: 94vh; width: auto; top: 3vh; right: 9%; }
+.duo-odo .panel-caption { top: auto; bottom: clamp(2rem, 6vh, 3.5rem); max-width: 42%; }
+
+/* Dyvsi: the bottles, then the label read up close */
+.panel--dyvsi { --w: 88vw; }
+.panel--dyvsi a { display: flex; }
+.dyvsi-bottles, .dyvsi-label { position: relative; display: block; overflow: hidden; }
+.dyvsi-bottles { flex: 1.25 1 0; }
+.dyvsi-bottles img { height: 72vh; width: auto; right: 6%; bottom: -5vh; }
+.dyvsi-label { flex: 1 1 0; background: #1f1d24; }
+.dyvsi-label img { inset: 0; margin: auto; height: 84vh; width: auto; }
+
+.panel--end { --w: 50vw; }
+.panel--end a { display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; padding-inline: clamp(1.5rem, 5vw, 5rem); }
+.panel-end-text { font-family: var(--display); font-size: clamp(3rem, 7vw, 7.5rem); line-height: 0.98; letter-spacing: -0.035em; }
 .panel-end-text em { color: inherit; display: block; }
 .panel-end-arrow { font-size: clamp(2.5rem, 6vw, 6rem); line-height: 1; transition: transform 0.5s var(--ease); }
 .panel--end a:hover .panel-end-arrow { transform: translateX(1.5rem); }
@@ -405,13 +420,39 @@ dialog.gallery::backdrop { background: var(--ink); }
 
 /* Tablets and phones */
 @media (max-width: 900px) {
-  .panel { height: 88vh; height: 88svh; }
-  .panel-count::after { content: ' \00B7  Swipe \2192'; display: block; margin-top: 0.15rem; font-size: 0.8125rem; white-space: nowrap; }
-  .is-travel .panel-count::after { content: ' \00B7  Keep scrolling \2193'; }
-  .panel-photo { width: 92vw; }
-  .panel--end { flex-basis: 100vw; }
-  .panel-product { inset: 0 0 12%; width: 88vw; max-height: 56svh; }
-  .panel-name { top: 44%; font-size: 30vw; }
+  /* The work becomes a pile of cards: each slides up over the last. A plain list if motion is reduced */
+  .showcase { overflow: visible; }
+  .showcase-track { display: block; overflow: visible; scroll-snap-type: none; }
+  .panel { width: 100%; height: 100vh; height: 100svh; }
+  .panel:not(:first-child) { border-radius: 1.25rem 1.25rem 0 0; }
+  .panel-caption { top: 1.5rem; }
+  .panel-title { font-size: clamp(2.5rem, 12vw, 4.5rem); }
+  .showcase-skip { position: sticky; display: block; width: fit-content; margin: -3.25rem var(--gutter) 0 auto; right: auto; bottom: 0.875rem; z-index: 20; height: 2.375rem; box-shadow: 0 2px 12px rgba(20, 8, 36, 0.3); }
+
+  .panel--starlys img { --iw: max(195vw, 72svh); }
+  .panel--starlys .panel-caption { bottom: 4.25rem; }
+  .panel--starlys .panel-title { font-size: clamp(3.5rem, 19vw, 7rem); }
+
+  .panel--grace .panel-title { font-size: min(19vw, 11svh); }
+  .pouch { height: auto; }
+  .pouch--chips { width: min(68vw, 36svh); left: 3vw; bottom: 30svh; }
+  .pouch--gari { width: min(74vw, 40svh); right: 3vw; bottom: 6svh; }
+
+  .panel--duo { display: flex; flex-direction: column; }
+  .panel--duo a { flex: 1 1 0; width: 100%; }
+  .duo-winnies img { inset: 3rem 0 0 auto; margin: auto 3vw auto auto; width: min(82vw, 40svh); }
+  .duo-odo img { height: 92%; top: 4%; right: 14%; }
+  .duo-odo .panel-caption { bottom: 1.25rem; max-width: 50%; }
+
+  .panel--dyvsi a { flex-direction: column; }
+  .dyvsi-bottles { flex: 1.8 1 0; }
+  .dyvsi-bottles img { height: 72%; right: 0; left: 0; bottom: -5%; margin-inline: auto; }
+  .dyvsi-label { flex: 1 1 0; }
+  .dyvsi-label img { height: 100%; width: min(66vw, 20rem); object-fit: cover; object-position: center 26%; }
+
+  .panel--end { height: 70vh; height: 70svh; }
+  .panel-end-text { font-size: clamp(3rem, 15vw, 6rem); }
+
   .founder-grid { grid-template-columns: 1fr; }
   .service-feature-grid { grid-template-columns: 1fr; }
   .service-feature--flip .service-feature-text { order: 0; }
@@ -437,6 +478,10 @@ dialog.gallery::backdrop { background: var(--ink); }
   .contact-list > * { grid-template-columns: 1fr auto; gap: 0.1rem 1rem; }
   .contact-list .label { grid-column: 1 / -1; }
   .timeline li { grid-template-columns: 7.5rem 1fr; }
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+  .panel { position: sticky; top: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

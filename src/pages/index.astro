@@ -10,17 +10,20 @@ import portrait from '../assets/michael-portrait.jpg';
 import cutGraceland from '../assets/cut/graceland.png';
 import cutWinnies from '../assets/cut/winnies.png';
 import cutWinniesUp from '../assets/cut/winnies-upright.png';
+import cutChips from '../assets/cut/graceland-chips.png';
+import cutGari from '../assets/cut/graceland-gari.png';
+import dyvsiLabel from '../assets/cut/dyvsi-label.jpg';
 import cutOdo from '../assets/cut/odo.png';
 import cutDyvsi from '../assets/cut/dyvsi.png';
 import cutStarlys from '../assets/cut/starlys.png';
 import optFinance from '../assets/work/opt-finance.jpg';
 
-const panels = await Promise.all(
-  ["Starly's", 'Graceland', 'Dyvsi', "Winnie's", 'Odo', 'Opt Finance'].map(async (name) => {
-    const project = projects.find((p) => p.client === name);
-    return { project, gallery: await galleryAttrs(project.image, `${project.client}: ${project.what}`) };
-  }),
-);
+// Four panels, five projects, each laid out differently. The rest are on the Work page
+const feature = async (name: string) => {
+  const project = projects.find((p) => p.client === name)!;
+  return { project, gallery: await galleryAttrs(project.image, `${project.client}: ${project.what}`) };
+};
+const [starlys, grace, winnies, odo, dyvsi] = await Promise.all(["Starly's", 'Graceland', "Winnie's", 'Odo', 'Dyvsi'].map(feature));
 // The hero line-up. On wide screens the first four stand in a row; on upright screens all five turn on a ring.
 const heroItems = [
   { img: cutWinniesUp, name: "Winnie's", disc: '#f0c02f', size: 0.96, tilt: -3, depth: 45, speed: -0.2, w: [240, 480] },
@@ -65,38 +68,69 @@ const peeks = { branding: cutDyvsi, packaging: cutGraceland, printing: optFinanc
 
   <section class="showcase" id="work" aria-label="Selected work">
     <div class="showcase-stage">
-    <div class="showcase-progress" aria-hidden="true"><span></span></div>
-    <ul class="showcase-track" tabindex="0">
-      {panels.map(({ project, gallery }, i) => (
-        <li class={`panel tone-${project.tone} ${project.cut ? '' : 'panel--photo'}`}>
-          <a {...gallery}>
-            <span class="panel-name" aria-hidden="true">{project.client}</span>
-            {project.cut ? (
-              <>
-                <Image class="panel-product" src={project.cut} alt={project.alt} widths={[600, 1000, 1500]} sizes="(max-width: 900px) 90vw, 58vw" format="webp" loading="lazy" />
-              </>
-            ) : (
-              <Image class="panel-product panel-photo" src={project.image} alt={project.alt} widths={[800, 1400, 2000]} sizes="(max-width: 900px) 90vw, 70vw" format="webp" loading="lazy" />
-            )}
+      <div class="showcase-progress" aria-hidden="true"><span></span></div>
+      <ul class="showcase-track">
+        <li class="panel panel--starlys tone-ink">
+          <a {...starlys.gallery}>
+            <Image src={starlys.project.cut} alt={starlys.project.alt} widths={[800, 1200, 1500]} sizes="(max-width: 900px) 195vw, 100vw" format="webp" loading="lazy" data-drift="3" />
             <span class="panel-caption">
-              <span class="panel-count">0{i + 1} / 0{panels.length}</span>
-              <span class="panel-title">{project.client}</span>
-              <span class="panel-what">{project.what}</span>
+              <span class="panel-title">{starlys.project.client}</span>
+              <span class="panel-what">{starlys.project.what}</span>
             </span>
           </a>
         </li>
-      ))}
-      <li class="panel panel--end tone-yellow">
-        <a href="/work/">
-          <span class="panel-end-text">See all <em>the work</em></span>
-          <span class="panel-end-arrow" aria-hidden="true">&rarr;</span>
-        </a>
-      </li>
-    </ul>
+        <li class="panel panel--grace tone-cream">
+          <a {...grace.gallery}>
+            <span class="panel-caption">
+              <span class="panel-title">{grace.project.client}</span>
+              <span class="panel-what">{grace.project.what}</span>
+            </span>
+            <Image class="pouch pouch--chips" src={cutChips} alt="" widths={[400, 710]} sizes="(max-width: 900px) 68vw, 34vw" format="webp" loading="lazy" data-drift="9" />
+            <Image class="pouch pouch--gari" src={cutGari} alt={grace.project.alt} widths={[440, 768]} sizes="(max-width: 900px) 74vw, 38vw" format="webp" loading="lazy" data-drift="20" />
+          </a>
+        </li>
+        <li class="panel panel--duo">
+          <a class="duo-winnies tone-yellow" {...winnies.gallery}>
+            <span class="panel-caption">
+              <span class="panel-title">{winnies.project.client}</span>
+              <span class="panel-what">{winnies.project.what}</span>
+            </span>
+            <Image src={winnies.project.cut} alt={winnies.project.alt} widths={[500, 900, 1258]} sizes="(max-width: 900px) 84vw, 44vw" format="webp" loading="lazy" data-drift="10" />
+          </a>
+          <a class="duo-odo tone-plum" {...odo.gallery}>
+            <span class="panel-caption">
+              <span class="panel-title">{odo.project.client}</span>
+              <span class="panel-what">{odo.project.what}</span>
+            </span>
+            <Image src={odo.project.cut} alt={odo.project.alt} widths={[240, 425]} sizes="(max-width: 900px) 30vw, 18vw" format="webp" loading="lazy" data-drift="14" />
+          </a>
+        </li>
+        <li class="panel panel--dyvsi">
+          <a {...dyvsi.gallery}>
+            <span class="dyvsi-bottles tone-lime">
+              <span class="panel-caption">
+                <span class="panel-title">{dyvsi.project.client}</span>
+                <span class="panel-what">{dyvsi.project.what}</span>
+              </span>
+              <Image src={dyvsi.project.cut} alt={dyvsi.project.alt} widths={[420, 873]} sizes="(max-width: 900px) 80vw, 42vw" format="webp" loading="lazy" data-drift="7" />
+            </span>
+            <span class="dyvsi-label">
+              <Image src={dyvsiLabel} alt="" width={284} format="webp" loading="lazy" data-drift="5" />
+            </span>
+          </a>
+        </li>
+        <li class="panel panel--end tone-yellow">
+          <a href="/work/">
+            <span class="panel-end-text">See all <em>the work</em></span>
+            <span class="panel-end-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      </ul>
+      <a class="showcase-skip" href="#services">Skip to services <span aria-hidden="true">&darr;</span></a>
     </div>
   </section>
 
-  <section class="section service-index">
+  <section class="section service-index" id="services">
     <div class="wrap">
       <p class="label" data-rise>What we do</p>
       <ul>

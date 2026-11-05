@@ -112,17 +112,6 @@ media.add('(prefers-reduced-motion: no-preference)', () => {
   });
 });
 
-// Each product drifts against the direction of travel, and its name the other way
-function panelDrift(travel: gsap.core.Tween) {
-  gsap.utils.toArray<HTMLElement>('.panel').forEach((panel) => {
-    const product = panel.querySelector('.panel-product');
-    const name = panel.querySelector('.panel-name');
-    const shared = { ease: 'none', scrollTrigger: { trigger: panel, containerAnimation: travel, start: 'left right', end: 'right left', scrub: true } };
-    if (product) gsap.fromTo(product, { xPercent: 16, rotate: 4 }, { xPercent: -16, rotate: -4, ...shared });
-    if (name) gsap.fromTo(name, { xPercent: -12 }, { xPercent: 12, ...shared });
-  });
-}
-
 // Desktop: the work showcase pins and travels sideways
 media.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
   const section = document.querySelector<HTMLElement>('.showcase');
@@ -147,54 +136,29 @@ media.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () =
   if (progress) {
     gsap.fromTo(progress, { scaleX: 0 }, { scaleX: 1, ease: 'none', scrollTrigger: { trigger: section, start: 'top top', end: () => `+=${distance()}`, scrub: true } });
   }
-  panelDrift(travel);
+  // Each picture drifts at its own rate against the direction of travel
+  gsap.utils.toArray<HTMLElement>('.panel').forEach((panel) => {
+    panel.querySelectorAll<HTMLElement>('[data-drift]').forEach((el) => {
+      const drift = parseFloat(el.dataset.drift ?? '0');
+      gsap.fromTo(el, { xPercent: drift }, { xPercent: -drift, ease: 'none', scrollTrigger: { trigger: panel, containerAnimation: travel, start: 'left right', end: 'right left', scrub: true } });
+    });
+  });
   return () => section.classList.remove('is-pinned');
 });
 
-// Phones and tablets: the same sideways travel, held in place with position: sticky,
-// which stays steady while a phone's address bar comes and goes
+// Phones and tablets: the cards stack with position: sticky. Animation only adds depth:
+// a card sinks back as the next covers it, and its pictures settle as it arrives
 media.add('(max-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
-  const section = document.querySelector<HTMLElement>('.showcase');
-  const track = section?.querySelector<HTMLElement>('.showcase-track');
-  if (!section || !track) return;
-  section.classList.add('is-travel');
-  const count = track.children.length;
-  const distance = () => (count - 1) * window.innerWidth;
-  const setHeight = () => {
-    section.style.height = `calc(100svh + ${distance()}px)`;
-  };
-  setHeight();
-  ScrollTrigger.addEventListener('refreshInit', setHeight);
-  // Load the pictures just before they are needed
-  const loader = ScrollTrigger.create({
-    trigger: section,
-    start: 'top 200%',
-    once: true,
-    onEnter: () => track.querySelectorAll('img').forEach((img) => (img.loading = 'eager')),
+  const cards = gsap.utils.toArray<HTMLElement>('.panel');
+  cards.forEach((card, i) => {
+    const next = cards[i + 1];
+    if (next) {
+      gsap.to(card, { scale: 0.93, transformOrigin: '50% 30%', ease: 'none', scrollTrigger: { trigger: next, start: 'top bottom', end: 'top top', scrub: true } });
+    }
+    if (i > 0) {
+      gsap.fromTo(card.querySelectorAll('img'), { scale: 1.12 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'top top', scrub: true } });
+    }
   });
-  const travel = gsap.to(track, {
-    x: () => -distance(),
-    ease: 'none',
-    scrollTrigger: {
-      trigger: section,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.35,
-      invalidateOnRefresh: true,
-      snap: { snapTo: 1 / (count - 1), inertia: false, duration: { min: 0.2, max: 0.5 }, delay: 0.08, ease: 'power2.out' },
-    },
-  });
-  const progress = section.querySelector<HTMLElement>('.showcase-progress span');
-  if (progress) {
-    gsap.fromTo(progress, { scaleX: 0 }, { scaleX: 1, ease: 'none', scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: true } });
-  }
-  panelDrift(travel);
-  return () => {
-    loader.kill();
-    ScrollTrigger.removeEventListener('refreshInit', setHeight);
-    section.classList.remove('is-travel');
-    section.style.height = '';
-  };
 });
 
 // Upright screens: the hero products turn on a ring. It moves by itself, and a finger can spin it
