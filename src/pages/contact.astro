@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+<Base title="Contact" description="Contact Vision Effects in Accra by phone, email or WhatsApp to discuss branding, packaging or print.">
+  <section class="page-intro page-intro--contact">
+    <div class="wrap">
+      <h1 data-lines>
+        <span class="line"><span>Let's talk about</span></span>
+        <span class="line"><span><em>your project.</em></span></span>
+      </h1>
+      <p class="lede" data-intro>Tell us what you need, how many, and when you need it. We'll take it from there.</p>
+      <div class="contact-list">
+        <a href={site.whatsapp} data-intro><span class="label">WhatsApp</span><span class="value">{site.phone}</span><span class="go" aria-hidden="true">&rarr;</span></a>
+        <a href={site.phoneHref} data-intro><span class="label">Phone</span><span class="value">{site.phone}</span><span class="go" aria-hidden="true">&rarr;</span></a>
+        <a href={`mailto:${site.email}`} data-intro><span class="label">Email</span><span class="value">{site.email}</span><span class="go" aria-hidden="true">&rarr;</span></a>
+        <div data-intro><span class="label">Studio</span><span class="value">Accra, Ghana</span></div>
+      </div>
+      <div class="social" data-intro>
+        <a class="link" href={site.instagram}>Instagram</a>
+        <a class="link" href={site.facebook}>Facebook</a>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,23 @@
+---
+import { Image } from 'astro:assets';
+import { galleryAttrs } from '../data/gallery';
+
+const { project, size = 'half', loading = 'lazy' } = Astro.props;
+const gallery = await galleryAttrs(project.image, `${project.client}: ${project.what}`);
+const sizes = size === 'full' ? '(max-width: 680px) 84vw, 100vw' : '(max-width: 680px) 84vw, 60vw';
+---
+<li class={`tile tile--${size}`} data-category={project.category} data-rise>
+  <a {...gallery}>
+    <div class={`tile-stage tone-${project.tone} ${project.cut ? '' : 'tile-stage--photo'}`} data-lean>
+      {project.cut ? (
+        <Image class="tile-cut" data-lean-target src={project.cut} alt={project.alt} widths={[500, 900, 1400]} sizes={sizes} format="webp" loading={loading} />
+      ) : (
+        <Image class="tile-photo" src={project.image} alt={project.alt} widths={[500, 900, 1400]} sizes={sizes} format="webp" loading={loading} />
+      )}
+    </div>
+    <div class="tile-caption">
+      <h3>{project.client}</h3>
+      <p>{project.what}</p>
+    </div>
+  </a>
+</li>

@@ -1,0 +1,123 @@
+<dialog class="gallery" aria-label="Image gallery">
+  <div class="gallery-bar">
+    <p data-count aria-live="polite"></p>
+    <button type="button" class="gallery-close" data-close>Close</button>
+  </div>
+  <ul class="gallery-track" data-track tabindex="0"></ul>
+  <button type="button" class="gallery-nav gallery-nav--prev" data-prev aria-label="Previous image">&larr;</button>
+  <button type="button" class="gallery-nav gallery-nav--next" data-next aria-label="Next image">&rarr;</button>
+</dialog>
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.gallery')!;
+  const track = dialog.querySelector<HTMLElement>('[data-track]')!;
+  const count = dialog.querySelector<HTMLElement>('[data-count]')!;
+  const prev = dialog.querySelector<HTMLButtonElement>('[data-prev]')!;
+  const next = dialog.querySelector<HTMLButtonElement>('[data-next]')!;
+  let current = 0;
+  let total = 0;
+  let historyEntry = false;
+  // Set while an arrow or key press is moving to a slide, so the count stays on the destination
+  let target: number | null = null;
+
+  const isVisible = (el: HTMLElement) => el.offsetParent !== null;
+
+  function buildSlides(links: HTMLAnchorElement[]) {
+    track.replaceChildren(
+      ...links.map((link) => {
+        const slide = document.createElement('li');
+        slide.className = 'gallery-slide';
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.sizes = '100vw';
+        if (link.dataset.srcset) img.srcset = link.dataset.srcset;
+        img.src = link.href;
+        img.alt = link.querySelector('img')?.alt ?? '';
+        const caption = document.createElement('p');
+        caption.textContent = link.dataset.caption ?? '';
+        slide.append(img, caption);
+        return slide;
+      }),
+    );
+  }
+
+  function showCount() {
+    count.textContent = `${current + 1} of ${total}`;
+    prev.disabled = current === 0;
+    next.disabled = current === total - 1;
+  }
+
+  function goTo(index: number, behavior: ScrollBehavior = 'smooth') {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    current = index;
+    target = index;
+    showCount();
+    track.scrollTo({ left: index * track.clientWidth, behavior: reduced ? 'auto' : behavior });
+  }
+
+  function open(links: HTMLAnchorElement[], index: number) {
+    total = links.length;
+    current = index;
+    buildSlides(links);
+    document.documentElement.classList.add('gallery-open');
+    dialog.showModal();
+    goTo(index, 'auto');
+    history.pushState({ gallery: true }, '');
+    historyEntry = true;
+  }
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-viewer]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-viewer]')].filter(isVisible);
+      open(links, links.indexOf(link));
+    });
+  });
+
+  let frame = 0;
+  track.addEventListener('scroll', () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      const index = Math.round(track.scrollLeft / track.clientWidth);
+      if (target !== null) {
+        if (index === target) target = null;
+        return;
+      }
+      if (index !== current) {
+        current = index;
+        showCount();
+      }
+    });
+  });
+
+  // A swipe or trackpad scroll takes over from any arrow movement
+  track.addEventListener('touchstart', () => (target = null), { passive: true });
+  track.addEventListener('wheel', () => (target = null), { passive: true });
+
+  prev.addEventListener('click', () => goTo(current - 1));
+  next.addEventListener('click', () => goTo(current + 1));
+  dialog.querySelector('[data-close]')!.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowRight' && current < total - 1) goTo(current + 1);
+    if (event.key === 'ArrowLeft' && current > 0) goTo(current - 1);
+  });
+  window.addEventListener('resize', () => {
+    if (dialog.open) goTo(current, 'auto');
+  });
+
+  // The phone's back button closes the gallery instead of leaving the page
+  dialog.addEventListener('close', () => {
+    document.documentElement.classList.remove('gallery-open');
+    track.replaceChildren();
+    if (historyEntry) {
+      historyEntry = false;
+      history.back();
+    }
+  });
+  window.addEventListener('popstate', () => {
+    if (dialog.open) {
+      historyEntry = false;
+      dialog.close();
+    }
+  });
+</script>

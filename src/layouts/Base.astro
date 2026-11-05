@@ -1,0 +1,117 @@
+---
+import '@fontsource-variable/hanken-grotesk';
+import '@fontsource-variable/fraunces';
+import '@fontsource-variable/fraunces/wght-italic.css';
+import '../styles/global.css';
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+import { nav, site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.tagline}`;
+const path = Astro.url.pathname;
+const canonical = new URL(path, Astro.site);
+const ogImage = new URL('/og.jpg', Astro.site);
+const year = new Date().getFullYear();
+const schema = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: site.name,
+  url: Astro.site,
+  telephone: site.phone,
+  email: site.email,
+  address: { '@type': 'PostalAddress', addressLocality: 'Accra', addressCountry: 'GH' },
+  sameAs: [site.instagram, site.facebook],
+});
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#241338" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={schema}></script>
+    <script is:inline>
+      (function () {
+        var r = document.documentElement;
+        r.classList.add('js');
+        if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+          r.classList.add('motion');
+          // If the animation script never arrives, show everything anyway
+          setTimeout(function () {
+            if (!window.__motionReady) r.classList.remove('motion');
+          }, 2500);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/" aria-label="Vision Effects home">
+          <Image src={logo} alt="" width={168} />
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+        <nav class="site-nav" id="site-nav" aria-label="Main">
+          <ul>
+            {nav.map((n) => (
+              <li><a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a></li>
+            ))}
+            <li><a class="btn btn--yellow" href="/contact/">Contact us</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <div class="footer-grid">
+          <div>
+            <Image src={logo} alt="Vision Effects" width={168} />
+            <p>Branding, packaging and print.<br />Based in Accra, working with clients in Ghana and abroad.</p>
+          </div>
+          <div>
+            <h2>Pages</h2>
+            <ul>
+              <li><a href="/">Home</a></li>
+              {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+              <li><a href="/contact/">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Get in touch</h2>
+            <ul>
+              <li><a href={site.phoneHref}>{site.phone}</a></li>
+              <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+              <li><a href={site.whatsapp}>WhatsApp</a></li>
+              <li><a href={site.instagram}>Instagram</a></li>
+              <li><a href={site.facebook}>Facebook</a></li>
+            </ul>
+          </div>
+        </div>
+        <p class="footer-base">&copy; {year} Vision Effects Ghana. All rights reserved.</p>
+      </div>
+    </footer>
+    <script>
+      import '../scripts/site.ts';
+      import '../scripts/motion.ts';
+    </script>
+  </body>
+</html>

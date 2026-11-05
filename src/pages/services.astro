@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Cta from '../components/Cta.astro';
+import { services } from '../data/site';
+import cutDyvsi from '../assets/cut/dyvsi.png';
+import cutGraceland from '../assets/cut/graceland.png';
+import dataAppcom from '../assets/work/data-appcom.jpg';
+import cutStarlys from '../assets/cut/starlys.png';
+
+const pictures = {
+  branding: { src: cutDyvsi, tone: 'lime', cut: true },
+  packaging: { src: cutGraceland, tone: 'plum', cut: true },
+  printing: { src: dataAppcom, tone: 'ink', cut: false },
+  digital: { src: cutStarlys, tone: 'yellow', cut: true },
+};
+---
+<Base title="Services" description="Corporate branding, packaging and graphic design, general printing, and digital and video work from Vision Effects in Accra.">
+  <section class="page-intro">
+    <div class="wrap">
+      <h1 data-lines>
+        <span class="line"><span>One team for</span></span>
+        <span class="line"><span><em>everything</em> your</span></span>
+        <span class="line"><span>brand touches.</span></span>
+      </h1>
+      <p class="lede" data-intro>Everything your brand needs to look consistent, on the shelf, on paper and on screen.</p>
+    </div>
+  </section>
+  {services.map((s, i) => (
+    <section class={`service-feature ${i % 2 ? 'service-feature--flip' : ''}`} id={s.id}>
+      <div class="wrap service-feature-grid">
+        <div class="service-feature-text">
+          <p class="label" data-rise>0{i + 1}</p>
+          <h2 data-words>{s.title}</h2>
+          <p class="service-feature-detail" data-rise>{s.detail}</p>
+          <ul data-rise>{s.items.map((item) => <li>{item}</li>)}</ul>
+        </div>
+        <div class={`service-feature-art tone-${pictures[s.id].tone} ${pictures[s.id].cut ? '' : 'is-photo'}`} data-lean data-rise>
+          <Image data-lean-target src={pictures[s.id].src} alt="" widths={[500, 900, 1300]} sizes="(max-width: 860px) 100vw, 50vw" format="webp" loading="lazy" />
+        </div>
+      </div>
+    </section>
+  ))}
+  <Cta title="Not sure where to start? Just ask." />
+</Base>

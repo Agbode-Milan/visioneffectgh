@@ -1,0 +1,130 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Viewer from '../components/Viewer.astro';
+import Cta from '../components/Cta.astro';
+import { projects, logos } from '../data/work';
+import { services } from '../data/site';
+import { galleryAttrs } from '../data/gallery';
+import portrait from '../assets/michael-portrait.jpg';
+import cutGraceland from '../assets/cut/graceland.png';
+import cutWinnies from '../assets/cut/winnies.png';
+import cutOdo from '../assets/cut/odo.png';
+import cutDyvsi from '../assets/cut/dyvsi.png';
+import cutStarlys from '../assets/cut/starlys.png';
+import optFinance from '../assets/work/opt-finance.jpg';
+
+const panels = await Promise.all(
+  ["Starly's", 'Graceland', 'Dyvsi', "Winnie's", 'Odo', 'Opt Finance'].map(async (name) => {
+    const project = projects.find((p) => p.client === name);
+    return { project, gallery: await galleryAttrs(project.image, `${project.client}: ${project.what}`) };
+  }),
+);
+const peeks = { branding: cutDyvsi, packaging: cutGraceland, printing: optFinance, digital: cutStarlys };
+---
+<Base description="Vision Effects is a branding and print studio in Accra, Ghana. We design logos, packaging and stationery, and produce quality print.">
+  <section class="hero" data-hero>
+    <div class="hero-products" aria-hidden="true">
+      <div class="float float--a" data-speed="-0.28"><div data-depth="46"><div data-float><Image src={cutGraceland} alt="" widths={[420, 800]} sizes="(max-width: 760px) 66vw, 36vw" format="webp" loading="eager" fetchpriority="high" /></div></div></div>
+      <div class="float float--b" data-speed="-0.5"><div data-depth="-34"><div data-float><Image src={cutOdo} alt="" widths={[200, 400]} sizes="(max-width: 760px) 24vw, 13vw" format="webp" loading="eager" /></div></div></div>
+      <div class="float float--c" data-speed="-0.12"><div data-depth="26"><div data-float><Image src={cutWinnies} alt="" widths={[360, 720]} sizes="(max-width: 760px) 50vw, 30vw" format="webp" loading="eager" /></div></div></div>
+    </div>
+    <div class="wrap hero-copy">
+      <p class="hero-kicker" data-intro>Branding, packaging and print. Accra.</p>
+      <h1 data-lines>
+        <span class="line"><span>Brands people</span></span>
+        <span class="line"><span><em>reach for.</em></span></span>
+      </h1>
+      <div class="hero-foot" data-intro>
+        <p>From the first sketch to the final print, handled by one team.</p>
+        <a class="btn btn--yellow magnetic" href="#work">See the work</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="statement">
+    <div class="wrap">
+      <p data-fill>A logo is a promise. Packaging is the proof. Print is what people keep. We design all three, so your brand says one thing, everywhere it appears.</p>
+    </div>
+  </section>
+
+  <section class="showcase" id="work" aria-label="Selected work">
+    <div class="showcase-progress" aria-hidden="true"><span></span></div>
+    <ul class="showcase-track" tabindex="0">
+      {panels.map(({ project, gallery }, i) => (
+        <li class={`panel tone-${project.tone} ${project.cut ? '' : 'panel--photo'}`}>
+          <a {...gallery}>
+            <span class="panel-name" aria-hidden="true">{project.client}</span>
+            {project.cut ? (
+              <>
+                <Image class="panel-product" src={project.cut} alt={project.alt} widths={[600, 1000, 1500]} sizes="(max-width: 900px) 90vw, 58vw" format="webp" loading="lazy" />
+              </>
+            ) : (
+              <Image class="panel-product panel-photo" src={project.image} alt={project.alt} widths={[800, 1400, 2000]} sizes="(max-width: 900px) 90vw, 70vw" format="webp" loading="lazy" />
+            )}
+            <span class="panel-caption">
+              <span class="panel-count">0{i + 1} / 0{panels.length}</span>
+              <span class="panel-title">{project.client}</span>
+              <span class="panel-what">{project.what}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+      <li class="panel panel--end tone-yellow">
+        <a href="/work/">
+          <span class="panel-end-text">See all <em>the work</em></span>
+          <span class="panel-end-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section service-index">
+    <div class="wrap">
+      <p class="label" data-rise>What we do</p>
+      <ul>
+        {services.map((s, i) => (
+          <li data-rise>
+            <a href={`/services/#${s.id}`} data-peek-row={s.id}>
+              <span class="service-num" aria-hidden="true">0{i + 1}</span>
+              <span class="service-title">{s.title}</span>
+              <span class="service-summary">{s.summary}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="service-peek" aria-hidden="true">
+      {Object.entries(peeks).map(([id, img]) => (
+        <div data-peek={id} class={id === 'printing' ? 'is-photo' : ''}><Image src={img} alt="" width={520} format="webp" loading="lazy" /></div>
+      ))}
+    </div>
+  </section>
+
+  <section class="clients" aria-label="Clients">
+    <div class="clients-track">
+      {[0, 1].map((n) => (
+        <ul aria-hidden={n === 1 ? 'true' : undefined}>
+          {logos.map((l) => <li><Image src={l.image} alt={n === 0 ? `${l.client} logo` : ''} height={136} format="webp" loading="lazy" /></li>)}
+        </ul>
+      ))}
+    </div>
+  </section>
+
+  <section class="section founder">
+    <div class="wrap founder-grid">
+      <div class="founder-photo" data-rise>
+        <Image data-zoom src={portrait} alt="Michael Xorla Domee, CEO and Creative Director of Vision Effects" widths={[480, 800, 1200]} sizes="(max-width: 820px) 100vw, 45vw" format="webp" loading="lazy" />
+      </div>
+      <div>
+        <p class="label" data-rise>Led by a working designer</p>
+        <h2 data-words>Your project stays close to the person directing it.</h2>
+        <p class="founder-text" data-rise>Michael Xorla Domee has led Vision Effects since 2017. Trained in graphic design and film editing, he works directly with clients to shape work that fits their business.</p>
+        <a class="link" href="/about/" data-rise>About the studio</a>
+      </div>
+    </div>
+  </section>
+
+  <Cta />
+  <Viewer />
+</Base>

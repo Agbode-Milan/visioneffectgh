@@ -1,0 +1,77 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Tile from '../components/Tile.astro';
+import Viewer from '../components/Viewer.astro';
+import Cta from '../components/Cta.astro';
+import { projects, logos } from '../data/work';
+import { galleryAttrs } from '../data/gallery';
+
+const categories = ['All', ...new Set(projects.map((p) => p.category))];
+const logoLinks = await Promise.all(logos.map((l) => galleryAttrs(l.image, `${l.client}: logo`)));
+// A deliberate rhythm of sizes, so the page doesn't read as a uniform grid
+const rhythm = ['full', 'wide', 'narrow', 'narrow', 'wide', 'wide', 'narrow'];
+---
+<Base title="Work" description="Packaging, stationery and logo design by Vision Effects for businesses and organisations in Ghana and abroad.">
+  <section class="page-intro">
+    <div class="wrap">
+      <h1 data-lines>
+        <span class="line"><span>Picked up,</span></span>
+        <span class="line"><span>passed on,</span></span>
+        <span class="line"><span><em>remembered.</em></span></span>
+      </h1>
+      <p class="lede" data-intro>Packaging, stationery and brand identities for businesses and organisations of different kinds and sizes.</p>
+    </div>
+  </section>
+
+  <section class="section work-list">
+    <div class="wrap">
+      <div class="filters" role="group" aria-label="Filter work by category">
+        {categories.map((c, i) => (
+          <button type="button" data-filter={c} aria-pressed={i === 0 ? 'true' : 'false'}>{c}</button>
+        ))}
+      </div>
+      <ul class="tiles swipe" aria-label="Our work" tabindex="0">
+        {projects.map((p, i) => <Tile project={p} size={rhythm[i]} loading={i < 2 ? 'eager' : 'lazy'} />)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section logos-section">
+    <div class="wrap">
+      <h2 data-words>Logos and identities</h2>
+      <ul class="logo-grid swipe" aria-label="Logos and identities" tabindex="0">
+        {logos.map((l, i) => (
+          <li data-rise>
+            <a {...logoLinks[i]}>
+              <Image src={l.image} alt={`${l.client} logo`} height={208} format="webp" loading="lazy" />
+              <span>{l.client}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <Cta title="Want work like this for your business?" />
+  <Viewer />
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const tiles = document.querySelectorAll<HTMLElement>('.tile');
+    const list = document.querySelector<HTMLElement>('.tiles');
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        const filtering = b.dataset.filter !== 'All';
+        buttons.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+        tiles.forEach((t) => {
+          t.hidden = filtering && t.dataset.category !== b.dataset.filter;
+          t.style.opacity = '1';
+          t.style.transform = 'none';
+        });
+        list?.classList.toggle('is-filtered', filtering);
+        list?.dispatchEvent(new CustomEvent('swipe:refresh'));
+        window.dispatchEvent(new Event('resize'));
+      }),
+    );
+  </script>
+</Base>
