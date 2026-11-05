@@ -9,6 +9,7 @@ import { galleryAttrs } from '../data/gallery';
 import portrait from '../assets/michael-portrait.jpg';
 import cutGraceland from '../assets/cut/graceland.png';
 import cutWinnies from '../assets/cut/winnies.png';
+import cutWinniesUp from '../assets/cut/winnies-upright.png';
 import cutOdo from '../assets/cut/odo.png';
 import cutDyvsi from '../assets/cut/dyvsi.png';
 import cutStarlys from '../assets/cut/starlys.png';
@@ -20,24 +21,38 @@ const panels = await Promise.all(
     return { project, gallery: await galleryAttrs(project.image, `${project.client}: ${project.what}`) };
   }),
 );
+// The hero line-up. On wide screens the first four stand in a row; on upright screens all five turn on a ring.
+const heroItems = [
+  { img: cutWinniesUp, name: "Winnie's", disc: '#f0c02f', size: 0.96, tilt: -3, depth: 45, speed: -0.2, w: [240, 480] },
+  { img: cutOdo, name: 'Odo', disc: '#3b2263', size: 1, tilt: 2, depth: 70, speed: -0.42, w: [200, 400] },
+  { img: cutStarlys, name: "Starly's", disc: '#a8c83a', size: 0.84, tilt: -2, depth: 40, speed: -0.3, w: [480, 900] },
+  { img: cutGraceland, name: 'Graceland', disc: '#f8f4ea', size: 0.86, tilt: 3, depth: 95, speed: -0.14, w: [560, 1000], start: true },
+  { img: cutDyvsi, name: 'Dyvsi', disc: '#a8c83a', size: 0.86, tilt: 0, depth: 50, speed: -0.25, w: [400, 700], ringOnly: true },
+];
 const peeks = { branding: cutDyvsi, packaging: cutGraceland, printing: optFinance, digital: cutStarlys };
 ---
 <Base description="Vision Effects is a branding and print studio in Accra, Ghana. We design logos, packaging and stationery, and produce quality print.">
   <section class="hero" data-hero>
-    <div class="hero-products" aria-hidden="true">
-      <div class="float float--a" data-speed="-0.28"><div data-depth="46"><div data-float><Image src={cutGraceland} alt="" widths={[420, 800]} sizes="(max-width: 760px) 66vw, 36vw" format="webp" loading="eager" fetchpriority="high" /></div></div></div>
-      <div class="float float--b" data-speed="-0.5"><div data-depth="-34"><div data-float><Image src={cutOdo} alt="" widths={[200, 400]} sizes="(max-width: 760px) 24vw, 13vw" format="webp" loading="eager" /></div></div></div>
-      <div class="float float--c" data-speed="-0.12"><div data-depth="26"><div data-float><Image src={cutWinnies} alt="" widths={[360, 720]} sizes="(max-width: 760px) 50vw, 30vw" format="webp" loading="eager" /></div></div></div>
-    </div>
     <div class="wrap hero-copy">
+      <div class="hero-products" aria-hidden="true">
+        <div class="hero-row">
+          <div class="hero-disc"></div>
+          {heroItems.map((item) => (
+            <div class:list={['float', { 'float--ring': item.ringOnly }]} data-speed={item.speed} data-name={item.name} data-disc={item.disc} data-start={item.start ? '' : undefined} style={`--ar: ${(item.img.width / item.img.height).toFixed(3)}; --size: ${item.size}; --tilt: ${item.tilt}deg;`}>
+              <div data-depth={item.depth}><div data-float><Image src={item.img} alt="" widths={item.w} sizes="(max-aspect-ratio: 1/1) 70vw, 30vw" format="webp" loading={item.ringOnly ? 'lazy' : 'eager'} fetchpriority={item.start ? 'high' : undefined} /></div></div>
+            </div>
+          ))}
+          <p class="hero-ring-name"></p>
+        </div>
+      </div>
       <p class="hero-kicker" data-intro>Branding, packaging and print. Accra.</p>
       <h1 data-lines>
         <span class="line"><span>Brands people</span></span>
         <span class="line"><span><em>reach for.</em></span></span>
       </h1>
-      <div class="hero-foot" data-intro>
-        <p>From the first sketch to the final print, handled by one team.</p>
-        <a class="btn btn--yellow magnetic" href="#work">See the work</a>
+      <div class="hero-foot">
+        <p data-intro>From the first sketch to the final print, handled by one team.</p>
+        <a class="btn btn--yellow magnetic" href="#work" data-intro>See the work</a>
       </div>
     </div>
   </section>
@@ -49,6 +64,7 @@ const peeks = { branding: cutDyvsi, packaging: cutGraceland, printing: optFinanc
   </section>
 
   <section class="showcase" id="work" aria-label="Selected work">
+    <div class="showcase-stage">
     <div class="showcase-progress" aria-hidden="true"><span></span></div>
     <ul class="showcase-track" tabindex="0">
       {panels.map(({ project, gallery }, i) => (
@@ -77,6 +93,7 @@ const peeks = { branding: cutDyvsi, packaging: cutGraceland, printing: optFinanc
         </a>
       </li>
     </ul>
+    </div>
   </section>
 
   <section class="section service-index">

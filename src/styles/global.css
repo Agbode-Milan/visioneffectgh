@@ -134,21 +134,40 @@ em { font-style: italic; color: var(--yellow); }
 .hero-copy a { pointer-events: auto; }
 .hero-kicker { font-weight: 600; color: var(--lime); margin-bottom: 1rem; }
 .hero h1 { font-size: clamp(3.5rem, min(13.4vw, 25vh), 14rem); line-height: 0.92; }
+@media (max-height: 800px) and (min-aspect-ratio: 1001/1000) { .hero h1 { font-size: clamp(3.5rem, min(13.4vw, 21vh), 14rem); } }
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; margin-top: clamp(1.5rem, 3vw, 2.5rem); }
 .hero-foot p { font-size: clamp(1.0625rem, 1.5vw, 1.375rem); color: var(--on-ink-soft); max-width: 26rem; line-height: 1.35; }
-.hero-products { position: absolute; inset: 0; z-index: 1; }
-.float { position: absolute; }
-.float img { width: 100%; }
+/* Wide screens: the products stand in a row above the headline, on one baseline, level with the right margin */
+.hero-products { position: relative; z-index: -1; flex: 1 1 auto; min-height: 6rem; margin-bottom: -1.25rem; pointer-events: none; }
+.hero-row { position: absolute; inset: 0 0 0 max(26%, 23rem); display: flex; justify-content: flex-end; align-items: flex-end; gap: 2.6vw; container-type: size; }
+.float { position: relative; flex: none; aspect-ratio: var(--ar); height: calc(var(--size) * 100%); rotate: var(--tilt); }
+@supports (width: 1cqw) { .float { height: calc(var(--size) * min(100cqh, 29cqw)); } }
+.float > div, [data-float] { height: 100%; }
+.float img { width: 100%; height: 100%; object-fit: contain; }
 .float, .float > div, [data-float] { will-change: transform; }
-.float--a { width: min(34vw, 56vh); right: 2vw; top: 11vh; rotate: 7deg; }
-.float--b { width: min(8vw, 13vh); right: 39vw; top: 7vh; rotate: -9deg; }
-.float--c { width: min(22vw, 36vh); left: 25vw; top: 9vh; rotate: -5deg; }
+.float--ring, .hero-disc, .hero-ring-name { display: none; }
 
-/* Tablets held upright have room for larger products */
-@media (min-width: 761px) and (max-aspect-ratio: 1/1) {
-  .float--a { width: 54vw; right: -2vw; top: 13vh; }
-  .float--b { width: 16vw; right: auto; left: 7vw; top: 12vh; }
-  .float--c { width: 38vw; left: 18vw; top: 33vh; }
+/* Upright screens: words first, then the products. Without animation they sit as a simple group */
+@media (max-aspect-ratio: 1/1) {
+  .hero h1 { font-size: min(18.5vw, 13svh); }
+  .hero-copy { padding-top: calc(var(--header) + 0.75rem); padding-bottom: 1.25rem; }
+  .hero-kicker { order: 1; margin-bottom: 0.625rem; }
+  .hero h1 { order: 2; }
+  .hero-foot { display: contents; }
+  .hero-foot p { order: 3; margin-top: 0.875rem; max-width: 24rem; }
+  .hero-products { order: 4; z-index: 0; min-height: min(15rem, 32svh); margin: 0.75rem calc(var(--gutter) * -1); }
+  .hero-foot .btn { order: 5; align-self: stretch; text-align: center; justify-content: center; }
+  .hero-row { inset: 0; justify-content: center; align-items: center; gap: 1rem; }
+  .float { height: 76%; }
+  .float:nth-of-type(4) { display: none; }
+  @supports (width: 1cqw) { .float { height: calc(var(--size) * min(86cqh, 40cqw)); } }
+
+  /* The turning ring */
+  .is-ring { pointer-events: auto; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; }
+  .is-ring .hero-row { display: block; overflow: hidden; }
+  .is-ring .float, .is-ring .float:nth-of-type(4), .is-ring .float--ring { --h: min(84cqh, calc(66cqw / var(--ar))); display: block; position: absolute; inset: 0 0 1.75rem; margin: auto; height: var(--h); width: calc(var(--h) * var(--ar)); }
+  .is-ring .hero-disc { --d: min(88cqh, 80cqw); display: block; position: absolute; inset: 0 0 1.75rem; margin: auto; width: var(--d); height: var(--d); border-radius: 50%; background: var(--yellow); }
+  .is-ring .hero-ring-name { display: block; position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-family: var(--display); font-style: italic; font-size: 1.125rem; line-height: 1.2; color: #fff; z-index: 40; }
 }
 
 /* Statement */
@@ -160,6 +179,12 @@ em { font-style: italic; color: var(--yellow); }
 .showcase-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; z-index: 5; background: rgba(255, 255, 255, 0.15); display: none; }
 .showcase-progress span { display: block; height: 100%; background: var(--yellow); transform-origin: left; transform: scaleX(0); }
 .showcase.is-pinned .showcase-progress { display: block; }
+/* Phones and tablets: vertical scrolling moves the work sideways. Without animation it stays a swipe row */
+.showcase.is-travel { overflow: visible; }
+.is-travel .showcase-stage { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; }
+.is-travel .showcase-progress { display: block; }
+.is-travel .showcase-track { overflow: visible; width: max-content; height: 100%; scroll-snap-type: none; will-change: transform; }
+.is-travel .panel { height: 100%; }
 .showcase-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
 .showcase-track::-webkit-scrollbar { display: none; }
 .showcase.is-pinned .showcase-track { overflow: visible; width: max-content; scroll-snap-type: none; }
@@ -180,7 +205,7 @@ em { font-style: italic; color: var(--yellow); }
   opacity: 0.13;
   pointer-events: none;
 }
-.panel-product { position: absolute; left: 50%; top: 50%; width: min(62vw, 110vh); max-height: 74vh; object-fit: contain; translate: -50% -50%; will-change: transform; }
+.panel-product { position: absolute; inset: 0; margin: auto; width: min(62vw, 110vh); max-height: 74vh; object-fit: contain; will-change: transform; }
 .panel-photo { width: min(68vw, 96vh); }
 .panel-caption { position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(1.5rem, 3.5vw, 3rem); display: grid; grid-template-columns: auto 1fr; gap: 0 1.25rem; align-items: baseline; }
 .panel-count { grid-row: span 2; font-size: 0.9375rem; font-weight: 600; opacity: 0.8; }
@@ -382,9 +407,10 @@ dialog.gallery::backdrop { background: var(--ink); }
 @media (max-width: 900px) {
   .panel { height: 88vh; height: 88svh; }
   .panel-count::after { content: ' \00B7  Swipe \2192'; display: block; margin-top: 0.15rem; font-size: 0.8125rem; white-space: nowrap; }
+  .is-travel .panel-count::after { content: ' \00B7  Keep scrolling \2193'; }
   .panel-photo { width: 92vw; }
   .panel--end { flex-basis: 100vw; }
-  .panel-product { width: 88vw; max-height: 56svh; top: 44%; }
+  .panel-product { inset: 0 0 12%; width: 88vw; max-height: 56svh; }
   .panel-name { top: 44%; font-size: 30vw; }
   .founder-grid { grid-template-columns: 1fr; }
   .service-feature-grid { grid-template-columns: 1fr; }
@@ -403,11 +429,6 @@ dialog.gallery::backdrop { background: var(--ink); }
   .site-nav a:not(.btn) { display: block; font-family: var(--display); font-size: clamp(2.5rem, 13vw, 3.75rem); line-height: 1.1; letter-spacing: -0.025em; font-weight: 400; background: none; }
   .site-nav .btn { margin-top: 1rem; padding: 0.95rem 1.6rem; }
   [id] { scroll-margin-top: 1rem; }
-  .hero h1 { font-size: 18.5vw; }
-  .hero-foot { flex-direction: column; align-items: flex-start; gap: 1rem; }
-  .float--a { width: 74vw; right: -8vw; top: 12svh; rotate: 8deg; }
-  .float--b { width: 21vw; left: 5vw; top: 11svh; right: auto; rotate: -9deg; }
-  .float--c { width: 52vw; left: 3vw; top: 31svh; rotate: -6deg; }
   .btn { padding-block: 0.95rem; }
   .site-footer a { display: inline-block; padding-block: 0.5rem; }
   .site-footer li { padding-block: 0; }
